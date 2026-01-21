@@ -1,0 +1,38 @@
+name: office_workforce_app
+description: Office Workforce Management System built with Flutter and Supabase
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Supabase backend
+  supabase_flutter: ^2.5.0
+
+  # State management
+  provider: ^6.1.2
+
+  # Date & time
+  intl: ^0.19.0
+
+  # UUID generator
+  uuid: ^4.3.3
+
+  # Loading animations
+  flutter_spinkit: ^5.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
