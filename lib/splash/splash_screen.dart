@@ -1,11 +1,5 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../auth/login_screen.dart';
-import '../dashboards/admin_dashboard.dart';
-import '../dashboards/manager_dashboard.dart';
-import '../dashboards/employee_dashboard.dart';
+import 'package:office_workforce_app/onboarding/onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,11 +16,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    _initAnimations();
-    _checkSession();
-  }
-
-  void _initAnimations() {
+    
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -47,62 +37,18 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
 
     _animationController.forward();
+    _navigateToNext();
   }
 
-  Future<void> _checkSession() async {
-    await Future.delayed(const Duration(milliseconds: 2500));
-
-    if (!mounted) return;
-
-    final session = Supabase.instance.client.auth.currentSession;
-
-    if (session == null) {
-      _goTo(const LoginScreen());
-    } else {
-      await _checkUserRole();
+  Future<void> _navigateToNext() async {
+    await Future.delayed(const Duration(seconds: 3));
+    if (mounted) {
+    
+      Navigator.pushReplacement(
+         context,
+         MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+       );
     }
-  }
-
-  Future<void> _checkUserRole() async {
-    final user = Supabase.instance.client.auth.currentUser;
-
-    if (user == null) {
-      _goTo(const LoginScreen());
-      return;
-    }
-
-    try {
-      final response = await Supabase.instance.client
-          .from('users')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-
-      final role = response['role'];
-
-      if (!mounted) return;
-
-      switch (role) {
-        case 'admin':
-          _goTo(const AdminDashboard());
-          break;
-        case 'manager':
-          _goTo(const ManagerDashboard());
-          break;
-        default:
-          _goTo(const EmployeeDashboard());
-      }
-    } catch (e) {
-      if (!mounted) return;
-      _goTo(const LoginScreen());
-    }
-  }
-
-  void _goTo(Widget screen) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => screen),
-    );
   }
 
   @override
@@ -113,134 +59,117 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isDarkMode = MediaQuery.of(context).platformBrightness == Brightness.dark;
-
     return Scaffold(
-      body: Container(
-        width: size.width,
-        height: size.height,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDarkMode
-                ? [
-                    const Color(0xFF1A237E),
-                    const Color(0xFF0D47A1),
-                    const Color(0xFF01579B),
-                  ]
-                : [
-                    const Color(0xFF1976D2),
-                    const Color(0xFF1565C0),
-                    const Color(0xFF0D47A1),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(),
+
+            // Animated Logo
+            AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                return FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: Container(
+                      width: 140,
+                      height: 140,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1976D2), Color(0xFF0D47A1)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(32),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF1976D2).withOpacity(0.3),
+                            blurRadius: 30,
+                            offset: const Offset(0, 15),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.work_outline_rounded,
+                        size: 70,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+
+            const SizedBox(height: 32),
+
+            // App Name
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: RichText(
+                text: const TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'SATA ',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1976D2),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'WorkHub',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF6B7280),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
                   ],
-          ),
-        ),
-        child: SafeArea(
-          child: AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) {
-              return Opacity(
-                opacity: _fadeAnimation.value,
-                child: Transform.scale(
-                  scale: _scaleAnimation.value,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Logo Container
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.business_center_rounded,
-                          size: 60,
-                          color: Color(0xFF1565C0),
-                        ),
-                      ),
+                ),
+              ),
+            ),
 
-                      const SizedBox(height: 32),
+            const SizedBox(height: 20),
 
-                      // App Name
-                      const Text(
-                        'SATA WorkHub',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
+            // Tagline
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Text(
+                'Workforce Management Made Simple',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ),
 
-                      const SizedBox(height: 8),
+            const Spacer(),
 
-                      // Tagline
-                      Text(
-                        'Smart Office Management',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white.withOpacity(0.9),
-                          fontWeight: FontWeight.w300,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-
-                      const SizedBox(height: 60),
-
-                      // Loading Indicator
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white.withOpacity(0.8),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      Text(
-                        'Loading...',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withOpacity(0.7),
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-
-                      const Spacer(),
-
-                      // Footer
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 32),
-                        child: Text(
-                          'Version 1.0.0',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white.withOpacity(0.6),
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                      ),
-                    ],
+            // Loading Indicator
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 60),
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      const Color(0xFF1976D2).withOpacity(0.7),
+                    ),
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );
