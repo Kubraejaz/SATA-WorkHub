@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:office_workforce_app/attendance/attendance_list_screen.dart';
+import 'package:office_workforce_app/auth/auth_controller.dart';
+import 'package:office_workforce_app/leave/leave_list_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth/login_screen.dart';
 
@@ -63,7 +66,7 @@ class ManagerDashboard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              _managementActionsGrid(),
+              _managementActionsGrid(context), // ✅ Pass context here
               const SizedBox(height: 20),
             ],
           ),
@@ -250,7 +253,8 @@ class ManagerDashboard extends StatelessWidget {
     );
   }
 
-  Widget _managementActionsGrid() {
+  // ✅ Pass BuildContext to this method
+  Widget _managementActionsGrid(BuildContext context) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -266,7 +270,14 @@ class ManagerDashboard extends StatelessWidget {
           gradient: const LinearGradient(
             colors: [Color(0xFF10B981), Color(0xFF059669)],
           ),
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AttendanceListScreen(role: 2),
+              ),
+            );
+          },
         ),
         _actionCard(
           icon: Icons.assignment_outlined,
@@ -284,8 +295,19 @@ class ManagerDashboard extends StatelessWidget {
           gradient: const LinearGradient(
             colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
           ),
-          onTap: () {},
+           onTap: () async {
+    final role = await AuthController.instance.getRole();
+    if (!context.mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LeaveListScreen(role: role),
+      ),
+    );
+  },
         ),
+
+        
         _actionCard(
           icon: Icons.analytics_outlined,
           title: 'Team Performance',

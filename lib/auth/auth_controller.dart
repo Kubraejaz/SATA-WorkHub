@@ -14,7 +14,7 @@ class AuthController {
     required String name,
     required String email,
     required String password,
-    int role = 3, // 3 = Employee (default)
+    int role = 3, // 1=Admin, 2=Manager, 3=Employee
   }) async {
     try {
       final authResponse = await _client.auth.signUp(
@@ -27,19 +27,15 @@ class AuthController {
         return 'Signup failed';
       }
 
-      // 🔑 Insert user profile
-      final insertResponse = await _client.from('users').insert({
-        'id': user.id, // MUST match auth.uid()
+      // Insert into public.users
+      await _client.from('users').insert({
+        'id': user.id,
         'name': name.trim(),
         'email': email.trim(),
         'role': role,
       });
 
-      if (insertResponse.error != null) {
-        return insertResponse.error!.message;
-      }
-
-      return null; // SUCCESS
+      return null;
     } catch (e) {
       return e.toString();
     }
@@ -59,7 +55,7 @@ class AuthController {
       );
 
       if (response.user == null) {
-        return 'Login failed';
+        return 'Invalid email or password';
       }
 
       return null;
@@ -81,11 +77,19 @@ class AuthController {
   User? get currentUser => _client.auth.currentUser;
 
   /// =======================
+  /// EMAIL VERIFIED CHECK
+  /// =======================
+  bool isEmailVerified() {
+    final user = currentUser;
+    return user != null && user.emailConfirmedAt != null;
+  }
+
+  /// =======================
   /// GET ROLE
   /// =======================
   Future<int> getRole() async {
     final user = currentUser;
-    if (user == null) return 3; // fallback → employee
+    if (user == null) return 3;
 
     final data = await _client
         .from('users')
@@ -101,6 +105,8 @@ class AuthController {
   /// =======================
   Future<void> navigateBasedOnRole(BuildContext context) async {
     final role = await getRole();
+
+    if (!context.mounted) return;
 
     switch (role) {
       case 1:

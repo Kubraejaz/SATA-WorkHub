@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:office_workforce_app/leave/apply_leave_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth/login_screen.dart';
+import '../attendance/employee_attendance_screen.dart';
+import '../attendance/attendance_list_screen.dart';
+import '../auth/auth_controller.dart';
 
 class EmployeeDashboard extends StatelessWidget {
   const EmployeeDashboard({super.key});
@@ -11,6 +15,24 @@ class EmployeeDashboard extends StatelessWidget {
       context,
       MaterialPageRoute(builder: (_) => const LoginScreen()),
     );
+  }
+
+  Future<void> _navigateToAttendance(BuildContext context) async {
+    final role = await AuthController.instance.getRole();
+
+    if (!context.mounted) return;
+
+    if (role == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const EmployeeAttendanceScreen()),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => AttendanceListScreen(role: role)),
+      );
+    }
   }
 
   @override
@@ -63,7 +85,7 @@ class EmployeeDashboard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              _quickActionsGrid(),
+              _quickActionsGrid(context),
               const SizedBox(height: 20),
             ],
           ),
@@ -222,7 +244,7 @@ class EmployeeDashboard extends StatelessWidget {
     );
   }
 
-  Widget _quickActionsGrid() {
+  Widget _quickActionsGrid(BuildContext context) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -238,7 +260,7 @@ class EmployeeDashboard extends StatelessWidget {
           gradient: const LinearGradient(
             colors: [Color(0xFF10B981), Color(0xFF059669)],
           ),
-          onTap: () {},
+          onTap: () => _navigateToAttendance(context),
         ),
         _actionCard(
           icon: Icons.assignment_outlined,
@@ -249,15 +271,23 @@ class EmployeeDashboard extends StatelessWidget {
           ),
           onTap: () {},
         ),
-        _actionCard(
-          icon: Icons.beach_access_outlined,
-          title: 'Apply Leave',
-          subtitle: 'Request time off',
-          gradient: const LinearGradient(
-            colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-          ),
-          onTap: () {},
-        ),
+       _actionCard(
+  icon: Icons.beach_access_outlined,
+  title: 'Apply Leave',
+  subtitle: 'Request time off',
+  gradient: const LinearGradient(
+    colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+  ),
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const ApplyLeaveScreen(),
+      ),
+    );
+  },
+),
+
         _actionCard(
           icon: Icons.trending_up,
           title: 'Performance',

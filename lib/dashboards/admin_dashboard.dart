@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:office_workforce_app/leave/leave_list_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth/login_screen.dart';
+import '../attendance/attendance_list_screen.dart';
+import '../auth/auth_controller.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
@@ -10,6 +13,17 @@ class AdminDashboard extends StatelessWidget {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
+  }
+
+  Future<void> _navigateToAttendance(BuildContext context) async {
+    final role = await AuthController.instance.getRole();
+
+    if (!context.mounted) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AttendanceListScreen(role: role)),
     );
   }
 
@@ -63,7 +77,7 @@ class AdminDashboard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              _adminActionsGrid(),
+              _adminActionsGrid(context), // Pass context here!
               const SizedBox(height: 20),
             ],
           ),
@@ -250,7 +264,7 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 
-  Widget _adminActionsGrid() {
+  Widget _adminActionsGrid(BuildContext context) { // <-- Pass context here
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -275,8 +289,29 @@ class AdminDashboard extends StatelessWidget {
           gradient: const LinearGradient(
             colors: [Color(0xFF10B981), Color(0xFF059669)],
           ),
-          onTap: () {},
+          onTap: () => _navigateToAttendance(context), // ✅ Works now
         ),
+
+ _actionCard(
+  icon: Icons.how_to_reg_outlined,
+  title: 'All Leave',
+  subtitle: 'Leave records',
+  gradient: const LinearGradient(
+    colors: [Color(0xFF10B981), Color(0xFF059669)],
+  ),
+  onTap: () async {
+    final role = await AuthController.instance.getRole();
+    if (!context.mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LeaveListScreen(role: role),
+      ),
+    );
+  },
+),
+
+
         _actionCard(
           icon: Icons.assignment_outlined,
           title: 'All Tasks',
