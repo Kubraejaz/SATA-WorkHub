@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:office_workforce_app/attendance/attendance_list_screen.dart';
 import 'package:office_workforce_app/auth/auth_controller.dart';
 import 'package:office_workforce_app/leave/leave_list_screen.dart';
+import 'package:office_workforce_app/tasks/task_add_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth/login_screen.dart';
 
@@ -286,7 +287,11 @@ class ManagerDashboard extends StatelessWidget {
           gradient: const LinearGradient(
             colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
           ),
-          onTap: () {},
+          onTap: () {Navigator.push(
+  context,
+  MaterialPageRoute(builder: (_) => const TaskAddScreen()),
+);
+},
         ),
         _actionCard(
           icon: Icons.approval_outlined,

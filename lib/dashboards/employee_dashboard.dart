@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:office_workforce_app/leave/apply_leave_screen.dart';
+import 'package:office_workforce_app/tasks/task_list_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth/login_screen.dart';
 import '../attendance/employee_attendance_screen.dart';
@@ -269,7 +270,11 @@ class EmployeeDashboard extends StatelessWidget {
           gradient: const LinearGradient(
             colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
           ),
-          onTap: () {},
+          onTap: () {Navigator.push(
+  context,
+  MaterialPageRoute(builder: (_) => const TaskListScreen()),
+);
+},
         ),
        _actionCard(
   icon: Icons.beach_access_outlined,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:office_workforce_app/leave/leave_list_screen.dart';
+import 'package:office_workforce_app/tasks/task_add_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth/login_screen.dart';
 import '../attendance/attendance_list_screen.dart';
@@ -319,7 +320,11 @@ class AdminDashboard extends StatelessWidget {
           gradient: const LinearGradient(
             colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
           ),
-          onTap: () {},
+          onTap: () {Navigator.push(
+  context,
+  MaterialPageRoute(builder: (_) => const TaskAddScreen()),
+);
+},
         ),
         _actionCard(
           icon: Icons.analytics_outlined,
